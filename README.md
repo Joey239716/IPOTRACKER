@@ -1,4 +1,4 @@
-# IPO Tracker
+# IPOStreet
 
 > A full-stack IPO hype tracking app — rebuilt with a better stack and full deployment.
 
