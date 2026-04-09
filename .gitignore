@@ -1,0 +1,10 @@
+# Logs
+logs/
+
+# Temp files
+tash
+
+# Environment
+.env
+.env*
+!.env.sample
