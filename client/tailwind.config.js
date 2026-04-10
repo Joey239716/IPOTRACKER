@@ -9,6 +9,10 @@ const config = {
   ],
   theme: {
 	extend: {
+		fontFamily: {
+			sans: ['var(--font-inter)', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+			mono: ['var(--font-mono)', 'JetBrains Mono', 'ui-monospace', 'monospace'],
+		},
 		borderRadius: {
 			lg: 'var(--radius)',
 			md: 'calc(var(--radius) - 2px)',

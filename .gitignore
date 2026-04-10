@@ -8,3 +8,29 @@ tash
 .env
 .env*
 !.env.sample
+.env.local
+.env.*.local
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+.next/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Secrets / keys
+*.pem
+*.key
+*.p12
+secrets/

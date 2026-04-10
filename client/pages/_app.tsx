@@ -2,6 +2,7 @@
 import type { AppProps } from 'next/app'
 import '@/styles/globals.css'
 import { Inter, JetBrains_Mono } from 'next/font/google'
+import { SearchProvider } from '@/lib/search-context'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -17,8 +18,10 @@ const jetbrainsMono = JetBrains_Mono({
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <main className={`${inter.variable} ${jetbrainsMono.variable} font-sans`}>
-      <Component {...pageProps} />
-    </main>
+    <SearchProvider>
+      <main className={`${inter.variable} ${jetbrainsMono.variable} font-sans`}>
+        <Component {...pageProps} />
+      </main>
+    </SearchProvider>
   )
 }

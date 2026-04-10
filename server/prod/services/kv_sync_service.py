@@ -41,8 +41,8 @@ class KVSyncService:
                 )
             )
 
-            # Limit to 100
-            limited = sorted_rows[:100]
+            # Limit to 500
+            limited = sorted_rows[:500]
 
             # Upload
             url = f"https://api.cloudflare.com/client/v4/accounts/{self.cf_account_id}/storage/kv/namespaces/{self.cf_namespace_id}/values/ipo_table"
