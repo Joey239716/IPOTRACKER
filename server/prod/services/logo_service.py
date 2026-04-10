@@ -3,6 +3,7 @@ import hmac
 import hashlib
 import datetime
 from io import BytesIO
+from pathlib import Path
 from typing import Optional
 import requests
 from PIL import Image, ImageDraw, ImageFont, ImageColor
@@ -11,6 +12,9 @@ from urllib.parse import urlparse
 
 from ..config import settings
 from .db import Database
+
+# Font bundled alongside this file
+_BUNDLED_FONT = Path(__file__).resolve().parent / "Inter-Bold.ttf"
 
 IPO_SUFFIXES = (
     "inc", "incorporated", "corp", "corporation", "company", "co", "ltd", "limited", "llc", "plc",
@@ -40,7 +44,8 @@ class LogoService:
     def __init__(self, db: Database) -> None:
         self.db = db
         self.session = requests.Session()
-        self.font_path = getattr(settings, 'LOGO_FONT_PATH', None)
+        self.font_path = str(_BUNDLED_FONT) if _BUNDLED_FONT.exists() else None
+        self.backfill_mode = False  # set True in backfill to avoid Google API quota
 
     # ---------- name cleaning ----------
     @staticmethod
@@ -97,6 +102,45 @@ class LogoService:
             if '429' in str(e) or 'quota' in str(e).lower():
                 print(f"[WARN] Google API quota exceeded: {e}")
             return None
+
+    # ---------- SEC filing URL extraction ----------
+    _FILING_URL_RE = re.compile(
+        r'(?:our\s+(?:website|web\s*site|internet\s+website)(?:\s+address)?\s+(?:is\s+(?:located\s+at|at)|address\s+is)\s*'
+        r'|(?:located\s+at|available\s+at|found\s+at|visit\s+us\s+at)\s+)'
+        r'((?:https?://)?(?:www\.)?[\w\-]+\.(?:com|io|co|net|org|ai|tech|app|us|info))',
+        re.IGNORECASE,
+    )
+
+    def extract_url_from_filing(self, text: str) -> Optional[str]:
+        """Extract the company's website URL directly from SEC filing text."""
+        m = self._FILING_URL_RE.search(text)
+        if not m:
+            return None
+        raw = m.group(1).strip().rstrip(".")
+        if not raw.startswith("http"):
+            raw = "https://" + raw
+        parsed = urlparse(raw)
+        return f"{parsed.scheme}://{parsed.netloc}"
+
+    # ---------- DuckDuckGo instant answer ----------
+    def search_homepage_duckduckgo(self, company_name: str) -> Optional[str]:
+        """Find company homepage via DuckDuckGo instant answer API (no key, no quota)."""
+        try:
+            r = self.session.get(
+                "https://api.duckduckgo.com/",
+                params={"q": company_name, "format": "json", "no_redirect": "1", "no_html": "1"},
+                timeout=settings.HTTP_TIMEOUT,
+                headers={"User-Agent": settings.SEC_USER_AGENT},
+            )
+            data = r.json()
+            url = data.get("AbstractURL") or data.get("OfficialWebsite")
+            if url:
+                parsed = urlparse(url)
+                if parsed.netloc:
+                    return f"{parsed.scheme}://{parsed.netloc}"
+        except Exception:
+            pass
+        return None
 
     # ---------- Favicon scraping ----------
     def get_favicon_url(self, homepage_url: str) -> Optional[str]:
@@ -276,43 +320,112 @@ class LogoService:
                 b = int(b2 + (b3 - b2) * sub)
             draw.line([(x, 0), (x, h)], fill=(r, g, b))
 
+    @staticmethod
+    def _get_monogram(name: str) -> str:
+        """Return the first letter of the company name."""
+        words = [w for w in name.strip().split() if w and w.lower() not in {
+            "inc", "corp", "ltd", "llc", "co", "the", "a", "an", "of", "and", "group", "holdings"
+        }]
+        if words:
+            return words[0][0].upper()
+        return name.strip()[0].upper() if name.strip() else "?"
+
+    @staticmethod
+    def draw_diagonal_gradient(draw, size, color1, color2, color3):
+        """Draw a diagonal (top-left → bottom-right) 3-color gradient."""
+        w, h = size
+        r1, g1, b1 = ImageColor.getrgb(color1)
+        r2, g2, b2 = ImageColor.getrgb(color2)
+        r3, g3, b3 = ImageColor.getrgb(color3)
+        for i in range(w + h):
+            ratio = i / (w + h)
+            if ratio < 0.5:
+                t = ratio * 2
+                r = int(r1 + (r2 - r1) * t)
+                g = int(g1 + (g2 - g1) * t)
+                b = int(b1 + (b2 - b1) * t)
+            else:
+                t = (ratio - 0.5) * 2
+                r = int(r2 + (r3 - r2) * t)
+                g = int(g2 + (g3 - g2) * t)
+                b = int(b2 + (b3 - b2) * t)
+            draw.line([(max(0, i - h), min(i, h - 1)), (min(i, w - 1), max(0, i - w))], fill=(r, g, b))
+
+    @staticmethod
+    def _draw_dot_pattern(draw, size, dot_color):
+        """Overlay a subtle grid of small semi-transparent dots."""
+        w, h = size
+        spacing = max(8, w // 8)
+        r, g, b = ImageColor.getrgb(dot_color)
+        for x in range(0, w, spacing):
+            for y in range(0, h, spacing):
+                draw.ellipse([x - 1, y - 1, x + 1, y + 1], fill=(r, g, b, 40))
+
+    @staticmethod
+    def _apply_rounded_corners(image: Image.Image, radius: int) -> Image.Image:
+        """Clip image to rounded rectangle using an alpha mask."""
+        image = image.convert("RGBA")
+        w, h = image.size
+        mask = Image.new("L", (w, h), 0)
+        md = ImageDraw.Draw(mask)
+        md.rounded_rectangle([0, 0, w - 1, h - 1], radius=radius, fill=255)
+        result = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        result.paste(image, mask=mask)
+        return result
+
     def generate_placeholder_webp(self, name: str) -> Optional[bytes]:
-        """Generate a placeholder logo with first letter and gradient background"""
+        """Generate a polished placeholder logo: diagonal gradient, dot pattern, monogram, rounded corners."""
         try:
-            letter = name.strip()[0].upper() if name else "?"
+            monogram = self._get_monogram(name)
             color1, color2, color3 = self.get_gradient_colors(name)
-            
+
             width, height = settings.LOGO_SIZE
-            upscale = 4
+            upscale = 8
             render_size = (width * upscale, height * upscale)
-            
-            image = Image.new("RGB", render_size, color="#ffffff")
-            draw = ImageDraw.Draw(image)
-            
-            self.draw_smooth_gradient(draw, render_size, color1, color2, color3)
-            
+
+            image = Image.new("RGBA", render_size, (0, 0, 0, 0))
+            draw = ImageDraw.Draw(image, "RGBA")
+
+            # Diagonal gradient background
+            self.draw_diagonal_gradient(draw, render_size, color1, color2, color3)
+
+            # Subtle dot pattern overlay
+            self._draw_dot_pattern(draw, render_size, "#FFFFFF")
+
+            # Monogram text
+            font_size = int(render_size[0] * 0.55)
             try:
-                if self.font_path:
-                    font = ImageFont.truetype(self.font_path, int(render_size[0] * 0.6))
-                else:
+                font = ImageFont.truetype(self.font_path, font_size) if self.font_path else ImageFont.load_default(size=font_size)
+            except Exception:
+                try:
+                    font = ImageFont.load_default(size=font_size)
+                except TypeError:
                     font = ImageFont.load_default()
-            except:
-                font = ImageFont.load_default()
-            
-            bbox = draw.textbbox((0, 0), letter, font=font)
-            text_width = bbox[2] - bbox[0]
-            text_height = bbox[3] - bbox[1]
-            x = (render_size[0] - text_width) / 2 - bbox[0]
-            y = (render_size[1] - text_height) / 2 - bbox[1]
-            
-            draw.text((x, y), letter, fill="white", font=font)
-            
+
+            # Soft drop shadow
+            shadow_draw = ImageDraw.Draw(image)
+            bbox = shadow_draw.textbbox((0, 0), monogram, font=font)
+            tw = bbox[2] - bbox[0]
+            th = bbox[3] - bbox[1]
+            tx = (render_size[0] - tw) / 2 - bbox[0]
+            ty = (render_size[1] - th) / 2 - bbox[1]
+            offset = max(2, render_size[0] // 32)
+            shadow_draw.text((tx + offset, ty + offset), monogram, fill=(0, 0, 0, 60), font=font)
+
+            # Main white text
+            draw.text((tx, ty), monogram, fill=(255, 255, 255, 245), font=font)
+
+            # Rounded corners (radius = 22% of render width → looks like an app icon)
+            corner_radius = render_size[0] // 5
+            image = self._apply_rounded_corners(image, corner_radius)
+
+            # Downscale to final size with LANCZOS
             final_image = image.resize(settings.LOGO_SIZE, resample=Image.LANCZOS)
-            
+
             buf = BytesIO()
-            final_image.save(buf, format="WEBP", quality=80)
+            final_image.save(buf, format="WEBP", quality=85)
             return buf.getvalue()
-            
+
         except Exception:
             return None
 
@@ -357,7 +470,7 @@ class LogoService:
             return f"https://{host}/storage/v1/object/public/{settings.BUCKET_NAME}/{object_name}"
 
     # ---------- public entrypoint ----------
-    def add_logo_if_missing_or_stale(self, cik: str, company_name: str) -> None:
+    def add_logo_if_missing_or_stale(self, cik: str, company_name: str, filing_text: str = "") -> None:
         row = self.db.get_logo_fields(cik)
         needs_refresh = False
         if not row or not row.get("logo_url") or not row.get("updated_logo_date"):
@@ -377,22 +490,43 @@ class LogoService:
         logo_type = None
         homepage = None
 
-        # Strategy 1: Try Google search + favicon scraping (primary)
-        homepage = self.search_homepage_google(company_name or "")
-        if homepage:
-            favicon_url = self.get_favicon_url(homepage)
-            if favicon_url:
-                logo_bytes = self.download_favicon_as_webp(favicon_url)
-                if logo_bytes:
-                    logo_type = "favicon"
+        if self.backfill_mode:
+            # Backfill strategy: SEC filing text → DuckDuckGo → placeholder
+            # Strategy 1: Extract URL directly from filing text
+            if filing_text:
+                homepage = self.extract_url_from_filing(filing_text)
+                if homepage:
+                    print(f"[LOGO] Found homepage in filing: {homepage}")
 
-        # Strategy 2: Generate placeholder (fallback)
+            # Strategy 2: DuckDuckGo instant answer
+            if not homepage:
+                homepage = self.search_homepage_duckduckgo(company_name or "")
+                if homepage:
+                    print(f"[LOGO] Found homepage via DuckDuckGo: {homepage}")
+
+            # Try to get favicon from whatever homepage we found
+            if homepage:
+                favicon_url = self.get_favicon_url(homepage)
+                if favicon_url:
+                    logo_bytes = self.download_favicon_as_webp(favicon_url)
+                    if logo_bytes:
+                        logo_type = "favicon"
+        else:
+            # Normal strategy: Google Custom Search → favicon
+            homepage = self.search_homepage_google(company_name or "")
+            if homepage:
+                favicon_url = self.get_favicon_url(homepage)
+                if favicon_url:
+                    logo_bytes = self.download_favicon_as_webp(favicon_url)
+                    if logo_bytes:
+                        logo_type = "favicon"
+
+        # Final fallback: generate placeholder
         if not logo_bytes:
             logo_bytes = self.generate_placeholder_webp(company_name or "")
             if logo_bytes:
                 logo_type = "placeholder"
 
-        # If we got a logo, upload it
         if not logo_bytes:
             return
 

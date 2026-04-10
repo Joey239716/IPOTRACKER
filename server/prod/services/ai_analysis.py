@@ -4,6 +4,7 @@
 import os
 import re
 import json
+import time
 import requests
 from bs4 import BeautifulSoup
 from supabase import Client
@@ -13,10 +14,22 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class AnalyzeIPO:
+    # Minimum seconds between OpenRouter API calls (free tier: ~20 RPM)
+    _MIN_INTERVAL = 4.0
+
     def __init__(self, supabase_client: Client, openai_client: OpenAI):
         self.supabase = supabase_client
         self.openai = openai_client
         self.headers = {"User-Agent": "joeydaspam@gmail.com"}
+        self._last_call_at: float = 0.0
+
+    def _wait_for_rate_limit(self):
+        """Block until at least _MIN_INTERVAL seconds have passed since the last call."""
+        elapsed = time.monotonic() - self._last_call_at
+        wait = self._MIN_INTERVAL - elapsed
+        if wait > 0:
+            print(f"[AI] Rate limiting: waiting {wait:.1f}s before next OpenRouter call...")
+            time.sleep(wait)
 
     def null_if_unknown(self, val):
         return None if isinstance(val, str) and val.strip().lower() == "unknown" else val
@@ -114,6 +127,12 @@ class AnalyzeIPO:
                 "4) market_cap:\n"
                 "- This should be the raise amount, Compute ONLY if BOTH post-IPO total shares outstanding AND a price (or range) exist.\n"
                 "- For price ranges, use midpoint. Multiply shares × price. Digits only; else \"unknown\".\n\n"
+                "5) website:\n"
+                "- Look for the company's official website URL in the filing text.\n"
+                "- Common phrases: \"our website is located at\", \"our website address is\", \"visit us at\", \"available at www.\"\n"
+                "- Output the full URL including https:// (e.g. \"https://www.example.com\").\n"
+                "- Strip any trailing paths — homepage root only (e.g. \"https://stripe.com\" not \"https://stripe.com/about\").\n"
+                "- If no website is mentioned → \"N/A\".\n\n"
                 "------------------------------------------------------------\n"
                 "HARD VALIDATION (apply before output)\n"
                 "------------------------------------------------------------\n"
@@ -122,6 +141,7 @@ class AnalyzeIPO:
                 "- \"share_price\": ^[0-9]+(\\.[0-9]+)?\\$$  OR  ^[0-9]+(\\.[0-9]+)?\\$ - [0-9]+(\\.[0-9]+)?\\$$  OR \"unknown\".\n"
                 "- \"market_cap\": ^[0-9]+$ or \"unknown\".\n"
                 "- \"exchange\": must be in normalized list or \"unknown\".\n"
+                "- \"website\": must start with http:// or https://, or be \"N/A\".\n"
                 "- If per-unit and per-share prices both appear for a unit deal, prefer per-unit.\n"
                 "- If only secondary shares are offered → IPO = \"no\".\n\n"
                 "------------------------------------------------------------\n"
@@ -132,14 +152,18 @@ class AnalyzeIPO:
                 "  \"Shares Offered\": \"...\",\n"
                 "  \"share_price\": \"...\",\n"
                 "  \"exchange\": \"...\",\n"
-                "  \"market_cap\": \"...\"\n"
+                "  \"market_cap\": \"...\",\n"
+                "  \"website\": \"...\"\n"
                 "}}\n"
             )
 
 
-            # Call GPT
+            # Call OpenRouter (rate-limited)
+            from ..config import settings as _settings
+            self._wait_for_rate_limit()
+            self._last_call_at = time.monotonic()
             ai_resp = self.openai.chat.completions.create(
-                model="gpt-5-nano",
+                model=_settings.OPENROUTER_MODEL,
                 messages=[{"role": "user", "content": prompt}],
                 temperature=1
             )
@@ -153,15 +177,27 @@ class AnalyzeIPO:
                 if self._is_placeholder(parsed.get(field)):
                     parsed[field] = "unknown"
 
+            # Parse website — treat "N/A" or non-http values as None
+            raw_website = parsed.get("website", "N/A") or "N/A"
+            website = (
+                raw_website
+                if isinstance(raw_website, str) and raw_website.startswith("http")
+                else None
+            )
+
             # Upsert results into DB & set analyzed=True
-            self.supabase.table("ipo").update({
+            update_data = {
                 "is_ipo": parsed.get("IPO", "").lower() == "yes",
                 "shares_offered": self.null_if_unknown_numeric(parsed.get("Shares Offered")),
                 "share_price": self.null_if_unknown(parsed.get("share_price")),
                 "exchange": self.null_if_unknown(parsed.get("exchange")),
                 "market_cap": self.null_if_unknown_numeric(parsed.get("market_cap")),
-                "analyzed": True
-            }).eq("cik", cik).execute()
+                "analyzed": True,
+            }
+            if website:
+                update_data["website_homepage"] = website
+
+            self.supabase.table("ipo").update(update_data).eq("cik", cik).execute()
 
         except Exception as e:
             print(f"Analysis failed for {cik}: {e}")

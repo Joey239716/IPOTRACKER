@@ -9,9 +9,12 @@ import { IPOTableDesktop } from "./IPOTableDesktop";
 import { IPOTableMobile } from "./IPOTableMobile";
 import { Pagination } from "./Pagination";
 import { IPOStats } from "./IPOStats";
+import { IPOCalendar } from "./IPOCalendar";
 import { useSorting } from "@/hooks/useSorting";
 import { usePagination } from "@/hooks/usePagination";
 import { IPO } from "@/lib/types";
+import { exchangeBadgeClasses } from "@/lib/ipo-utils";
+import { useSearch } from "@/lib/search-context";
 import type { User } from "@supabase/supabase-js"; // ✅ Supabase user type
 
 // Define response shape for rows coming from Supabase / KV
@@ -40,12 +43,21 @@ export default function MainPage() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [starLoading, setStarLoading] = useState<string | null>(null);
   const [dataSource, setDataSource] = useState<"supabase" | "kv">("kv");
+  const { query: searchQuery } = useSearch();
   const router = useRouter();
 
   const { sortedIpos, sortColumn, sortDirection, handleSort } = useSorting(ipos);
 
-  // Reset pagination when sort changes
-  const sortTrigger = `${sortColumn}-${sortDirection}`;
+  const filteredIpos = searchQuery
+    ? sortedIpos.filter(
+        (ipo) =>
+          ipo.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          ipo.ticker.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : sortedIpos;
+
+  // Reset pagination when sort or search changes
+  const sortTrigger = `${sortColumn}-${sortDirection}-${searchQuery}`;
   const {
     paginatedItems,
     currentPage,
@@ -58,7 +70,9 @@ export default function MainPage() {
     nextPage,
     prevPage,
     changeItemsPerPage,
-  } = usePagination(sortedIpos, sortTrigger);
+  } = usePagination(filteredIpos, sortTrigger);
+
+  const watchlistIpos = ipos.filter((ipo) => starred.has(ipo.cik));
 
   // ⭐ Toggle watchlist
   const toggleStar = async (cik: string) => {
@@ -241,61 +255,78 @@ export default function MainPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 select-none caret-transparent">
+    <div className="min-h-screen bg-[#F8FAFC] select-none caret-transparent font-sans">
       <Navbar />
-      <main className="max-w-7xl mx-auto p-4">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Upcoming IPOs
+      <main className="max-w-7xl 2xl:max-w-screen-2xl mx-auto px-2 py-6">
+        <div className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
+            Dashboard
           </h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            Discover the latest companies going public
-          </p>
         </div>
 
         {error && (
           <div className="text-sm text-red-500 mb-4">Error: {error}</div>
         )}
 
-        {/* 📊 Top Stats Section */}
-        <IPOStats ipos={ipos} loading={loading} />
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 items-start">
+          {/* Left column */}
+          <div>
+            {/* 📊 Top Stats Section */}
+            <IPOStats ipos={ipos} loading={loading} />
 
-        {/* 🖥️ Desktop Table */}
-        <IPOTableDesktop
-          loading={loading}
-          sortedIpos={paginatedItems}
-          starred={starred}
-          starLoading={starLoading}
-          dataSource={dataSource}
-          sortColumn={sortColumn}
-          sortDirection={sortDirection}
-          onToggleStar={toggleStar}
-          onSort={handleSort}
-        />
+            {/* 🖥️ Desktop Table */}
+            <IPOTableDesktop
+              loading={loading}
+              sortedIpos={filteredIpos.slice(0, 6)}
+              starred={starred}
+              starLoading={starLoading}
+              dataSource={dataSource}
+              sortColumn={sortColumn}
+              sortDirection={sortDirection}
+              onToggleStar={toggleStar}
+              onSort={handleSort}
+            />
 
-        {/* 📱 Mobile Table */}
-        <IPOTableMobile
-          loading={loading}
-          sortedIpos={paginatedItems}
-          starred={starred}
-          starLoading={starLoading}
-          onToggleStar={toggleStar}
-        />
+            {/* 📱 Mobile Table */}
+            <IPOTableMobile
+              loading={loading}
+              sortedIpos={filteredIpos.slice(0, 6)}
+              starred={starred}
+              starLoading={starLoading}
+              onToggleStar={toggleStar}
+            />
+          </div>
 
-        {!loading && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            itemsPerPage={itemsPerPage}
-            startIndex={startIndex}
-            endIndex={endIndex}
-            totalItems={totalItems}
-            onPageChange={goToPage}
-            onNextPage={nextPage}
-            onPrevPage={prevPage}
-            onItemsPerPageChange={changeItemsPerPage}
-          />
-        )}
+          {/* Right sidebar */}
+          <div className="hidden lg:flex flex-col gap-4 sticky top-6">
+            {/* IPO Calendar */}
+            <IPOCalendar ipos={ipos} />
+
+            {/* IPO Watchlist */}
+            <div className="bg-white rounded-2xl border border-gray-200 p-5 ">
+              <h2 className="text-sm font-semibold text-slate-900 mb-3">IPO Watchlist</h2>
+              {watchlistIpos.length === 0 ? (
+                <p className="text-xs text-slate-400">
+                  {user ? "No IPOs in your watchlist yet. Star one to get started." : "Sign in to track IPOs."}
+                </p>
+              ) : (
+                <ul className="space-y-3">
+                  {watchlistIpos.slice(0, 5).map((ipo) => (
+                    <li key={ipo.cik} className="flex items-center gap-2">
+                      <div className="flex flex-col flex-1 min-w-0">
+                        <span className="text-xs font-semibold text-slate-900 truncate">{ipo.companyName}</span>
+                        <span className="text-[10px] text-slate-500">{ipo.ticker}</span>
+                      </div>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold whitespace-nowrap ${exchangeBadgeClasses(ipo.exchange)}`}>
+                        {ipo.exchange || "—"}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
 
         {/* 🔐 Login Modal */}
         {showLoginModal && (
