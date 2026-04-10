@@ -220,9 +220,6 @@ export default function WatchlistPage() {
               My Watchlist
             </h1>
           </div>
-          <p className="text-gray-600 dark:text-gray-400 ml-14">
-            Track your favorite upcoming IPOs
-          </p>
         </div>
 
         {loading ? (
@@ -303,19 +300,6 @@ export default function WatchlistPage() {
                   {/* Logo and Company Name */}
                   <div className="flex items-start gap-4 mb-6 pr-8">
                     <div className="relative">
-                      {ipo.logoUrl ? (
-                        <div className="w-14 h-14 rounded-xl overflow-hidden bg-white/40 dark:bg-white/10 backdrop-blur-sm border border-white/50 dark:border-gray-600/50 p-2 shadow-md">
-                          <img
-                            src={ipo.logoUrl}
-                            alt={ipo.companyName}
-                            className="w-full h-full object-contain"
-                          />
-                        </div>
-                      ) : (
-                        <div className="w-14 h-14 rounded-xl bg-white/40 dark:bg-white/10 backdrop-blur-sm border border-white/50 dark:border-gray-600/50 flex items-center justify-center shadow-md">
-                          <Building2 className="w-6 h-6 text-gray-400 dark:text-gray-500" />
-                        </div>
-                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 truncate mb-2">

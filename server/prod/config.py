@@ -26,7 +26,8 @@ class Settings:
     SUPABASE_SERVICE_ROLE_KEY: str = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
     LOGO_DEV_KEY: str = os.getenv("LOGO_DEV_KEY", "")
     LOGO_NAME_SALT: str = os.getenv("LOGO_NAME_SALT", "")
-    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "") 
+    OPENROUTER_API_KEY: str = os.getenv("OPENROUTER_API_KEY", "")
+    OPENROUTER_MODEL: str = os.getenv("OPENROUTER_MODEL", "nvidia/nemotron-3-super-120b-a12b:free")
 
     # SEC requires a valid contact email in the UA (we use the same field everywhere)
     SEC_USER_AGENT: str = os.getenv("SEC_USER_AGENT", "")

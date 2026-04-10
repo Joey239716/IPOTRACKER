@@ -2,7 +2,7 @@ import argparse
 import datetime
 from zoneinfo import ZoneInfo
 from .pipeline.pipeline import Pipeline
-from .services.nasdaq_updater import upsert_to_supabase  # new Nasdaq updater
+from .services.nasdaq_updater import fetch_upcoming, apply_updates
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Nightly IPO pipeline")
@@ -24,7 +24,8 @@ def main() -> None:
 
     # 2️⃣ Nasdaq estimated date / IPO column updates
     print("\n=== Updating IPO info from Nasdaq ===")
-    upsert_to_supabase()
+    nasdaq_data = fetch_upcoming()
+    apply_updates(nasdaq_data, apply=True, supabase=pipeline.db.client)
     print("=== Nasdaq update complete ===\n")
 
     # 3️⃣ Push latest IPO table to Cloudflare KV

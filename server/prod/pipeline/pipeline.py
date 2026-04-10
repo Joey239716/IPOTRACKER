@@ -21,6 +21,9 @@ from ..services.kv_sync_service import KVSyncService
 # Only analyze these amendment forms with GPT
 FORMS_TO_ANALYZE = {"S-1/A", "F-1/A"}
 
+# Priority order for backfill AI analysis (higher index = better)
+BACKFILL_FORM_PRIORITY = {"S-1/A": 1, "F-1/A": 1, "424B1": 2, "424B4": 3}
+
 ET = ZoneInfo("America/Toronto")
 
 
@@ -70,9 +73,18 @@ class Pipeline:
         self.fetcher = EFTSFetcher()
         self.daily = DailyIndexChecker()
         self.cache = DailyCache()
+        self.skip_ai = False  # set True during backfill; analysis runs in a single post-pass
 
         # --- AI clients (minimal integration) ---
-        self.openai = OpenAI(api_key=settings.OPENAI_API_KEY)
+        self.openai = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=settings.OPENROUTER_API_KEY,
+            default_headers={
+                "HTTP-Referer": "https://theipostreet.com",
+                "X-Title": "IPO Street",
+            },
+            timeout=60.0,
+        )
         self.ai = AnalyzeIPO(self.db.client, self.openai)
 
         # --- KV sync for public data API ---
@@ -294,10 +306,11 @@ class Pipeline:
             except Exception as e:
                 print(f"[WARN] Logo update failed for {cik}: {e}")
 
-            # --- AI integration (enabled) ---
-            if form in FORMS_TO_ANALYZE and mainlink and not already_analyzed:
+            # --- AI integration ---
+            if self.skip_ai:
+                pass  # deferred to post-pass in backfill mode
+            elif form in FORMS_TO_ANALYZE and mainlink and not already_analyzed:
                 try:
-                    # Optional retry to make AI more resilient
                     _retry(lambda: self.ai.analyze_one(
                         cik=str(cik),
                         filing_url=mainlink,
@@ -305,8 +318,7 @@ class Pipeline:
                     ), retries=2, base_delay=1.0)
                     print(f"[AI] Analyze complete for CIK={cik} form={form}")
 
-                    # Persist analyzed=True to DB (Fix #2 part 2) + guard in-memory map (Fix #1)
-                    rec["analyzed"] = True  # so any subsequent upserts in this run carry the flag
+                    rec["analyzed"] = True
                     try:
                         _retry(lambda: self.db.client.table("ipo").update(
                             {
@@ -315,7 +327,7 @@ class Pipeline:
                             }
                         ).eq("cik", cik).execute())
                         if cik in active and isinstance(active[cik], dict):
-                            active[cik]["analyzed"] = True  # guard to avoid KeyError (Fix #1)
+                            active[cik]["analyzed"] = True
                     except Exception as e:
                         print(f"[WARN] Could not set analyzed=True for CIK={cik}: {e}")
 
@@ -352,3 +364,84 @@ class Pipeline:
         filings = self.daily.fetch_for_date(ds)
         # Direct call — rely on Redis for day-scope dedupe, DB for state transitions
         self._process_filings(filings)
+
+    # ----- backfill AI analysis: single pass on best document per CIK -----
+    def analyze_backfill(self) -> dict:
+        """
+        After backfill ingestion is complete, analyze each unanalyzed IPO using
+        the best available document (424B4 > 424B1 > latest S-1/A or F-1/A).
+        Returns stats: total, analyzed, skipped, failed.
+        """
+        resp = self.db.client.table("ipo") \
+            .select("cik, company_name, mainlink, latest_filing_type") \
+            .eq("is_ipo", True) \
+            .eq("analyzed", False) \
+            .execute()
+        rows = resp.data or []
+
+        # Group by CIK and keep only the best document per CIK
+        best: dict[str, dict] = {}
+        for row in rows:
+            cik = str(row.get("cik", ""))
+            form = row.get("latest_filing_type", "")
+            if not cik or not row.get("mainlink"):
+                continue
+            priority = BACKFILL_FORM_PRIORITY.get(form, 0)
+            if cik not in best or priority > BACKFILL_FORM_PRIORITY.get(best[cik]["latest_filing_type"], 0):
+                best[cik] = row
+
+        total = len(best)
+        stats = {"total": total, "analyzed": 0, "skipped": 0, "failed": 0}
+
+        if total == 0:
+            print("[AI-PASS] No unanalyzed IPOs found.")
+            return stats
+
+        print(f"\n[AI-PASS] Starting analysis of {total} unanalyzed IPO(s)...")
+        t0 = time.monotonic()
+
+        for i, (cik, row) in enumerate(best.items(), 1):
+            form = row.get("latest_filing_type", "")
+            mainlink = row.get("mainlink", "")
+            name = row.get("company_name", "")
+
+            if form not in BACKFILL_FORM_PRIORITY:
+                print(f"[AI-PASS] {i}/{total} SKIP CIK={cik} form={form} (not analyzable)")
+                stats["skipped"] += 1
+                continue
+
+            elapsed = time.monotonic() - t0
+            done = stats["analyzed"] + stats["failed"] + stats["skipped"]
+            eta_str = ""
+            if done > 0:
+                rate = elapsed / done
+                remaining_secs = rate * (total - done)
+                eta_str = f" | ETA ~{int(remaining_secs // 60)}m{int(remaining_secs % 60):02d}s"
+
+            print(f"[AI-PASS] {i}/{total} CIK={cik} form={form} company={name!r}{eta_str}")
+
+            try:
+                _retry(lambda: self.ai.analyze_one(
+                    cik=cik,
+                    filing_url=mainlink,
+                    company_name=name,
+                ), retries=2, base_delay=1.0)
+
+                self.db.client.table("ipo").update({
+                    "analyzed": True,
+                    "updated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                }).eq("cik", cik).execute()
+
+                stats["analyzed"] += 1
+                print(f"[AI-PASS] {i}/{total} OK CIK={cik}")
+            except Exception as e:
+                print(f"[AI-PASS] {i}/{total} FAIL CIK={cik}: {e}")
+                stats["failed"] += 1
+
+        total_elapsed = time.monotonic() - t0
+        print(
+            f"\n[AI-PASS] Done. "
+            f"Analyzed={stats['analyzed']} Skipped={stats['skipped']} Failed={stats['failed']} "
+            f"Total time={int(total_elapsed // 60)}m{int(total_elapsed % 60):02d}s"
+        )
+        return stats

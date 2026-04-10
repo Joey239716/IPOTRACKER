@@ -5,7 +5,7 @@ import { StarIcon as StarIconOutline } from "@heroicons/react/24/outline";
 import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
 import { useRouter } from "next/navigation";
 import { IPO } from "@/lib/types";
-import { exchangeBadgeClasses, formatCurrency, withPlaceholder } from "@/lib/ipo-utils";
+import { exchangeBadgeClasses, formatCurrency, formatIpoDate, withPlaceholder } from "@/lib/ipo-utils";
 
 interface Props {
   loading: boolean;
@@ -51,24 +51,31 @@ export const IPOTableMobile: React.FC<Props> = ({
   };
 
   return (
-    <div className="sm:hidden space-y-4">
+    <div className="sm:hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.18)] transition-shadow duration-300 overflow-hidden">
+      <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+        <h2 className="text-base font-semibold text-slate-900 dark:text-white">Upcoming IPOs</h2>
+        <a href="/dashboard" className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+          View All
+        </a>
+      </div>
+    <div className="p-4 space-y-4">
       {loading
         ? Array.from({ length: 5 }).map((_, idx) => (
             <div
               key={idx}
-              className="p-5 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-gray-800/70 shadow-lg border border-white/20 dark:border-gray-700/30 animate-pulse"
+              className="p-5 rounded-2xl bg-white border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] animate-pulse"
             >
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-5 h-5 bg-gray-200 dark:bg-gray-700 rounded" />
-                <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg" />
-                <div className="flex-1 h-4 bg-gray-200 dark:bg-gray-700 rounded" />
+                <div className="w-5 h-5 bg-slate-100 rounded" />
+                <div className="w-10 h-10 bg-slate-200 rounded-lg" />
+                <div className="flex-1 h-4 bg-slate-100 rounded" />
               </div>
               <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
                 {["Price", "Shares", "Raise", "Est. IPO", "Exchange"].map(
                   (label, i) => (
                     <React.Fragment key={i}>
-                      <div className="font-medium text-gray-600">{label}</div>
-                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded" />
+                      <div className="font-medium text-slate-500">{label}</div>
+                      <div className="h-4 bg-slate-100 rounded" />
                     </React.Fragment>
                   )
                 )}
@@ -79,90 +86,74 @@ export const IPOTableMobile: React.FC<Props> = ({
             <div
               key={ipo.cik}
               onClick={(e) => handleCardClick(ipo.cik, e)}
-              className="relative p-5 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-gray-800/70 shadow-xl hover:shadow-2xl hover:bg-white/80 dark:hover:bg-gray-800/80 border border-white/20 dark:border-gray-700/30 hover:-translate-y-1 transition-all duration-300 cursor-pointer"
-              style={{ 
+              className="p-5 rounded-2xl bg-white border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+              style={{
                 animation: `slideIn 0.4s ease-out ${index * 0.05}s both`
               }}
             >
-              {/* Rank Badge - Top Left */}
-              <div className="absolute top-3 left-3 flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/40 dark:to-blue-800/40 text-blue-700 dark:text-blue-300 font-bold text-xs shadow-sm">
-                {ipo.rank}
-              </div>
-              
               {/* Main Content */}
-              <div className="flex items-center gap-3 mb-4 mt-6">
-                <button
-                  onClick={() => onToggleStar(ipo.cik)}
-                  disabled={starLoading === ipo.cik}
-                  aria-label="Toggle Watchlist"
-                  className="disabled:opacity-40 hover:scale-110 transition-transform duration-200"
-                >
-                  {starred.has(ipo.cik) ? (
-                    <StarIconSolid className="w-6 h-6 text-yellow-400 drop-shadow-sm" />
-                  ) : (
-                    <StarIconOutline className="w-6 h-6 text-gray-400" />
-                  )}
-                </button>
-
-                {ipo.logoUrl ? (
-                  <img
-                    src={ipo.logoUrl}
-                    alt={ipo.companyName}
-                    className="w-12 h-12 rounded-lg object-contain shadow-sm"
-                  />
-                ) : (
-                  <div className="w-12 h-12 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700 rounded-lg" />
-                )}
-                
+              <div className="flex items-center gap-3 mb-4">
                 <div
                   className="flex flex-col truncate leading-tight flex-1"
                   title={ipo.companyName}
                 >
-                  <span className="text-base font-bold text-gray-900 dark:text-white truncate">
+                  <span className="text-base font-bold text-slate-900 truncate">
                     {ipo.companyName}
                   </span>
                   {ipo.ticker && ipo.ticker.trim() !== "" && (
-                    <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    <span className="text-xs text-slate-500 mt-0.5">
                       {ipo.ticker}
                     </span>
                   )}
                 </div>
+                <button
+                  onClick={() => onToggleStar(ipo.cik)}
+                  disabled={starLoading === ipo.cik}
+                  aria-label="Toggle Watchlist"
+                  className="disabled:opacity-40 hover:scale-110 transition-transform duration-200 shrink-0"
+                >
+                  {starred.has(ipo.cik) ? (
+                    <StarIconSolid className="w-5 h-5 text-yellow-400 drop-shadow-sm" />
+                  ) : (
+                    <StarIconOutline className="w-5 h-5 text-gray-400" />
+                  )}
+                </button>
               </div>
 
               {/* Data Grid */}
               <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
-                <div className="font-semibold text-gray-600 dark:text-gray-400">Price</div>
-                <div className="text-right font-medium text-gray-900 dark:text-gray-100">
+                <div className="font-semibold text-slate-500">Price</div>
+                <div className="text-right font-medium text-slate-700">
                   {withPlaceholder(ipo.sharePrice)}
                 </div>
 
-                <div className="font-semibold text-gray-600 dark:text-gray-400">Shares</div>
-                <div className="text-right font-medium text-gray-900 dark:text-gray-100">
+                <div className="font-semibold text-slate-500">Shares</div>
+                <div className="text-right font-medium text-slate-700">
                   {withPlaceholder(ipo.sharesOffered)}
                 </div>
 
-                <div className="font-semibold text-gray-600 dark:text-gray-400">Raise</div>
+                <div className="font-semibold text-slate-500">Raise</div>
                 <div className="text-right font-semibold">
                   {ipo.raiseAmount && ipo.raiseAmount.trim() !== "" ? (
-                    <span className="text-gray-900 dark:text-gray-100">
+                    <span className="text-slate-900">
                       {formatCurrency(ipo.raiseAmount)}
                     </span>
                   ) : (
-                    <span className="text-gray-400 italic font-normal">
+                    <span className="text-slate-400 italic font-normal">
                       Not available
                     </span>
                   )}
                 </div>
 
-                <div className="font-semibold text-gray-600 dark:text-gray-400">Est. IPO</div>
-                <div className={`text-right ${getDateColorClass(ipo.estimatedIpoDate)}`}>
-                  {withPlaceholder(ipo.estimatedIpoDate)}
+                <div className="font-semibold text-slate-500">Est. IPO</div>
+                <div className="text-right text-slate-700">
+                  {formatIpoDate(ipo.estimatedIpoDate)}
                 </div>
 
-                <div className="font-semibold text-gray-600 dark:text-gray-400">Exchange</div>
+                <div className="font-semibold text-slate-500">Exchange</div>
                 <div className="text-right">
                   <span
-                    className={`inline-block px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap backdrop-blur-sm ${exchangeBadgeClasses(
+                    className={`inline-block px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${exchangeBadgeClasses(
                       ipo.exchange
                     )}`}
                   >
@@ -170,9 +161,6 @@ export const IPOTableMobile: React.FC<Props> = ({
                   </span>
                 </div>
               </div>
-
-              {/* Gradient Border Effect on Hover */}
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-500/0 via-purple-500/0 to-pink-500/0 hover:from-blue-500/10 hover:via-purple-500/10 hover:to-pink-500/10 transition-all duration-300 pointer-events-none" />
             </div>
           ))}
 
@@ -188,6 +176,7 @@ export const IPOTableMobile: React.FC<Props> = ({
           }
         }
       `}</style>
+    </div>
     </div>
   );
 };

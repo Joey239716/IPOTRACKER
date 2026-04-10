@@ -58,6 +58,13 @@ export const formatPrice = (value: string | null | undefined): string | React.JS
   return num % 1 === 0 ? `$${num.toLocaleString("en-US")}` : `$${num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 };
 
+export const formatIpoDate = (date: string | null | undefined): string | React.JSX.Element => {
+  if (!date || date.trim() === "") return <span className="text-gray-400 italic">Not available</span>;
+  const d = new Date(date + "T00:00:00");
+  if (isNaN(d.getTime())) return <span className="text-gray-400 italic">Not available</span>;
+  return d.toLocaleDateString("en-US", { month: "long", day: "numeric" });
+};
+
 export const withPlaceholder = (
   value: string | null | undefined
 ): string | React.JSX.Element => {
