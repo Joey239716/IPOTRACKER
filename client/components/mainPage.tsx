@@ -255,11 +255,11 @@ export default function MainPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] select-none caret-transparent font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0f1117] select-none caret-transparent font-sans">
       <Navbar />
       <main className="max-w-7xl 2xl:max-w-screen-2xl mx-auto px-2 py-6">
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight mb-2">
             Dashboard
           </h1>
         </div>
@@ -303,8 +303,8 @@ export default function MainPage() {
             <IPOCalendar ipos={ipos} />
 
             {/* IPO Watchlist */}
-            <div className="bg-white rounded-2xl border border-gray-200 p-5 ">
-              <h2 className="text-sm font-semibold text-slate-900 mb-3">IPO Watchlist</h2>
+            <div className="bg-white dark:bg-[#161b27] rounded-2xl border border-gray-200 dark:border-[#252f3e] p-5">
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-3">IPO Watchlist</h2>
               {watchlistIpos.length === 0 ? (
                 <p className="text-xs text-slate-400">
                   {user ? "No IPOs in your watchlist yet. Star one to get started." : "Sign in to track IPOs."}
@@ -314,8 +314,8 @@ export default function MainPage() {
                   {watchlistIpos.slice(0, 5).map((ipo) => (
                     <li key={ipo.cik} className="flex items-center gap-2">
                       <div className="flex flex-col flex-1 min-w-0">
-                        <span className="text-xs font-semibold text-slate-900 truncate">{ipo.companyName}</span>
-                        <span className="text-[10px] text-slate-500">{ipo.ticker}</span>
+                        <span className="text-xs font-semibold text-slate-900 dark:text-slate-100 truncate">{ipo.companyName}</span>
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400">{ipo.ticker}</span>
                       </div>
                       <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold whitespace-nowrap ${exchangeBadgeClasses(ipo.exchange)}`}>
                         {ipo.exchange || "—"}
@@ -336,7 +336,7 @@ export default function MainPage() {
           >
             <div
               onClick={(e) => e.stopPropagation()}
-              className="relative w-[90%] max-w-md rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-lg bg-white dark:bg-gray-900 text-gray-800 dark:text-white transform transition-all duration-300 ease-out translate-y-8 opacity-0 animate-modal-drop"
+              className="relative w-[90%] max-w-md rounded-lg border border-gray-200 dark:border-[#252f3e] p-6 shadow-lg bg-white dark:bg-[#161b27] text-gray-800 dark:text-slate-100 transform transition-all duration-300 ease-out translate-y-8 opacity-0 animate-modal-drop"
             >
               <button
                 onClick={() => setShowLoginModal(false)}
@@ -347,7 +347,7 @@ export default function MainPage() {
               </button>
 
               <h2 className="text-lg font-semibold mb-2">To add your first IPO</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">
+              <p className="text-sm text-gray-600 dark:text-slate-300 mb-1">
                 Sign up to unlock Watchlist features and track IPOs you care about.
               </p>
               <p className="text-sm text-green-500 font-medium mb-4">It&apos;s free.</p>
@@ -372,7 +372,7 @@ export default function MainPage() {
           >
             <div
               onClick={(e) => e.stopPropagation()}
-              className="relative w-[90%] max-w-sm rounded-lg border border-gray-100 dark:border-gray-700 p-5 shadow-xl bg-white dark:bg-gray-900 text-gray-800 dark:text-white transform transition-all duration-300 ease-out translate-y-8 opacity-0 animate-modal-drop"
+              className="relative w-[90%] max-w-sm rounded-lg border border-gray-100 dark:border-[#252f3e] p-5 shadow-xl bg-white dark:bg-[#161b27] text-gray-800 dark:text-slate-100 transform transition-all duration-300 ease-out translate-y-8 opacity-0 animate-modal-drop"
             >
               <div className="flex items-center mb-3">
                 <div className="w-8 h-8 flex items-center justify-center bg-yellow-100 text-yellow-600 rounded-full dark:bg-yellow-900 dark:text-yellow-300">

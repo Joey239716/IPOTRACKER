@@ -161,7 +161,7 @@ export function IPOStats({ ipos, loading }: IPOStatsProps) {
         {[...Array(3)].map((_, i) => (
           <div
             key={i}
-            className="bg-white rounded-xl border border-gray-200 p-5 animate-pulse"
+            className="bg-white dark:bg-[#161b27] rounded-xl border border-gray-200 dark:border-[#252f3e] p-5 animate-pulse"
           >
             <div className="flex justify-between mb-4">
               <div className="h-4 bg-slate-100 rounded w-24" />
@@ -185,16 +185,16 @@ export function IPOStats({ ipos, loading }: IPOStatsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       {/* Active IPOs */}
-      <div className="bg-white rounded-xl border border-gray-200 p-5  transition-all duration-300">
+      <div className="bg-white dark:bg-[#161b27] rounded-xl border border-gray-200 dark:border-[#252f3e] p-5 transition-all duration-300">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-medium text-slate-500">Active IPOs</p>
-          <button className="text-slate-300 hover:text-slate-500 transition-colors font-bold tracking-widest text-sm">
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Active IPOs</p>
+          <button className="text-slate-300 dark:text-slate-600 hover:text-slate-500 dark:hover:text-slate-400 transition-colors font-bold tracking-widest text-sm">
             ···
           </button>
         </div>
         <div className="flex items-end justify-between gap-2">
           <div>
-            <p className="text-3xl font-bold text-slate-900 tracking-tight">{stats.totalIPOs}</p>
+            <p className="text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">{stats.totalIPOs}</p>
             {stats.weekChangePct !== null ? (
               <p className={`text-xs font-medium mt-1 ${stats.weekChangePositive ? 'text-emerald-500' : 'text-red-400'}`}>
                 {stats.weekChangePositive ? '+' : ''}{stats.weekChangePct}% this week
@@ -208,16 +208,16 @@ export function IPOStats({ ipos, loading }: IPOStatsProps) {
       </div>
 
       {/* Scheduled Today */}
-      <div className="bg-white rounded-xl border border-gray-200 p-5  transition-all duration-300">
+      <div className="bg-white dark:bg-[#161b27] rounded-xl border border-gray-200 dark:border-[#252f3e] p-5 transition-all duration-300">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-medium text-slate-500">Scheduled Today</p>
-          <button className="text-slate-300 hover:text-slate-500 transition-colors font-bold tracking-widest text-sm">
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Scheduled Today</p>
+          <button className="text-slate-300 dark:text-slate-600 hover:text-slate-500 dark:hover:text-slate-400 transition-colors font-bold tracking-widest text-sm">
             ···
           </button>
         </div>
         <div className="flex items-end justify-between gap-2">
           <div>
-            <p className="text-3xl font-bold text-slate-900 tracking-tight">{stats.scheduledToday}</p>
+            <p className="text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">{stats.scheduledToday}</p>
             <p className="text-xs font-medium mt-1 text-slate-400">
               {stats.upcomingThisWeek} upcoming this week
             </p>
@@ -227,16 +227,16 @@ export function IPOStats({ ipos, loading }: IPOStatsProps) {
       </div>
 
       {/* Total Value */}
-      <div className="bg-white rounded-xl border border-gray-200 p-5  transition-all duration-300">
+      <div className="bg-white dark:bg-[#161b27] rounded-xl border border-gray-200 dark:border-[#252f3e] p-5 transition-all duration-300">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-medium text-slate-500">Total Value</p>
-          <button className="text-slate-300 hover:text-slate-500 transition-colors font-bold tracking-widest text-sm">
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Total Value</p>
+          <button className="text-slate-300 dark:text-slate-600 hover:text-slate-500 dark:hover:text-slate-400 transition-colors font-bold tracking-widest text-sm">
             ···
           </button>
         </div>
         <div className="flex items-end justify-between gap-2">
           <div>
-            <p className="text-3xl font-bold text-slate-900 tracking-tight">{stats.totalValue}</p>
+            <p className="text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">{stats.totalValue}</p>
             <p className="text-xs font-medium mt-1 text-emerald-500">
               {stats.thisWeekValue ? `${stats.thisWeekValue} this week` : <span className="text-slate-400">No data this week</span>}
             </p>

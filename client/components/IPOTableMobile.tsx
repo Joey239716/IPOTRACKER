@@ -51,9 +51,9 @@ export const IPOTableMobile: React.FC<Props> = ({
   };
 
   return (
-    <div className="sm:hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.18)] transition-shadow duration-300 overflow-hidden">
-      <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
-        <h2 className="text-base font-semibold text-slate-900 dark:text-white">Upcoming IPOs</h2>
+    <div className="sm:hidden rounded-2xl border border-gray-200 dark:border-[#252f3e] bg-white dark:bg-[#161b27] shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.18)] transition-shadow duration-300 overflow-hidden">
+      <div className="px-5 py-4 border-b border-gray-100 dark:border-[#252f3e] flex items-center justify-between">
+        <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">Upcoming IPOs</h2>
         <a href="/dashboard" className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
           View All
         </a>
@@ -63,7 +63,7 @@ export const IPOTableMobile: React.FC<Props> = ({
         ? Array.from({ length: 5 }).map((_, idx) => (
             <div
               key={idx}
-              className="p-5 rounded-2xl bg-white border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] animate-pulse"
+              className="p-5 rounded-2xl bg-white dark:bg-[#1c2333] border border-gray-100 dark:border-[#252f3e] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] animate-pulse"
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-5 h-5 bg-slate-100 rounded" />
@@ -86,7 +86,7 @@ export const IPOTableMobile: React.FC<Props> = ({
             <div
               key={ipo.cik}
               onClick={(e) => handleCardClick(ipo.cik, e)}
-              className="p-5 rounded-2xl bg-white border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+              className="p-5 rounded-2xl bg-white dark:bg-[#1c2333] border border-gray-100 dark:border-[#252f3e] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-all duration-300 cursor-pointer"
               style={{
                 animation: `slideIn 0.4s ease-out ${index * 0.05}s both`
               }}
@@ -97,11 +97,11 @@ export const IPOTableMobile: React.FC<Props> = ({
                   className="flex flex-col truncate leading-tight flex-1"
                   title={ipo.companyName}
                 >
-                  <span className="text-base font-bold text-slate-900 truncate">
+                  <span className="text-base font-bold text-slate-900 dark:text-slate-100 truncate">
                     {ipo.companyName}
                   </span>
                   {ipo.ticker && ipo.ticker.trim() !== "" && (
-                    <span className="text-xs text-slate-500 mt-0.5">
+                    <span className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                       {ipo.ticker}
                     </span>
                   )}
@@ -122,35 +122,35 @@ export const IPOTableMobile: React.FC<Props> = ({
 
               {/* Data Grid */}
               <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
-                <div className="font-semibold text-slate-500">Price</div>
-                <div className="text-right font-medium text-slate-700">
+                <div className="font-semibold text-slate-500 dark:text-slate-400">Price</div>
+                <div className="text-right font-medium text-slate-700 dark:text-slate-300">
                   {withPlaceholder(ipo.sharePrice)}
                 </div>
 
-                <div className="font-semibold text-slate-500">Shares</div>
-                <div className="text-right font-medium text-slate-700">
+                <div className="font-semibold text-slate-500 dark:text-slate-400">Shares</div>
+                <div className="text-right font-medium text-slate-700 dark:text-slate-300">
                   {withPlaceholder(ipo.sharesOffered)}
                 </div>
 
-                <div className="font-semibold text-slate-500">Raise</div>
+                <div className="font-semibold text-slate-500 dark:text-slate-400">Raise</div>
                 <div className="text-right font-semibold">
                   {ipo.raiseAmount && ipo.raiseAmount.trim() !== "" ? (
-                    <span className="text-slate-900">
+                    <span className="text-slate-900 dark:text-slate-100">
                       {formatCurrency(ipo.raiseAmount)}
                     </span>
                   ) : (
-                    <span className="text-slate-400 italic font-normal">
+                    <span className="text-slate-400 dark:text-slate-500 italic font-normal">
                       Not available
                     </span>
                   )}
                 </div>
 
-                <div className="font-semibold text-slate-500">Est. IPO</div>
-                <div className="text-right text-slate-700">
+                <div className="font-semibold text-slate-500 dark:text-slate-400">Est. IPO</div>
+                <div className="text-right text-slate-700 dark:text-slate-300">
                   {formatIpoDate(ipo.estimatedIpoDate)}
                 </div>
 
-                <div className="font-semibold text-slate-500">Exchange</div>
+                <div className="font-semibold text-slate-500 dark:text-slate-400">Exchange</div>
                 <div className="text-right">
                   <span
                     className={`inline-block px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${exchangeBadgeClasses(

@@ -41,13 +41,13 @@ export function IPOCalendar({ ipos }: Props) {
   while (cells.length % 7 !== 0) cells.push(null);
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-5">
-      <h2 className="text-sm font-semibold text-slate-900 mb-4">{monthLabel}</h2>
+    <div className="bg-white dark:bg-[#161b27] rounded-2xl border border-gray-200 dark:border-[#252f3e] p-5">
+      <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-4">{monthLabel}</h2>
 
       {/* Day labels */}
       <div className="grid grid-cols-7 mb-1">
         {DAY_LABELS.map((d) => (
-          <div key={d} className="text-center text-[10px] font-semibold text-slate-400 uppercase">
+          <div key={d} className="text-center text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase">
             {d}
           </div>
         ))}
@@ -65,8 +65,8 @@ export function IPOCalendar({ ipos }: Props) {
               <span
                 className={`w-7 h-7 flex items-center justify-center rounded-full text-xs font-medium
                   ${isToday
-                    ? "bg-slate-900 text-white"
-                    : "text-slate-600"
+                    ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900"
+                    : "text-slate-600 dark:text-slate-300"
                   }`}
               >
                 {day}
@@ -82,7 +82,7 @@ export function IPOCalendar({ ipos }: Props) {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-100">
+      <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-100 dark:border-[#252f3e]">
         <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
         <span className="text-[10px] text-slate-400">IPO scheduled</span>
       </div>

@@ -66,19 +66,19 @@ export const IPOTableDesktop: React.FC<Props> = ({
   };
 
   return (
-    <div className="hidden sm:block rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.18)] transition-shadow duration-300 overflow-hidden">
-      <div className="px-7 py-6 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
-        <h2 className="text-[25px] font-semibold text-slate-900 dark:text-white">Upcoming IPOs</h2>
+    <div className="hidden sm:block rounded-2xl border border-gray-200 dark:border-[#252f3e] bg-white dark:bg-[#161b27] shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.18)] transition-shadow duration-300 overflow-hidden">
+      <div className="px-7 py-6 border-b border-gray-100 dark:border-[#252f3e] flex items-center justify-between">
+        <h2 className="text-[25px] font-semibold text-slate-900 dark:text-slate-100">Upcoming IPOs</h2>
         <a href="/dashboard" className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
           View All
         </a>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
-          <thead className="border-b border-gray-100 bg-slate-50/80">
+          <thead className="border-b border-gray-100 dark:border-[#252f3e] bg-slate-50/80 dark:bg-[#1c2333]/60">
             <tr>
               <th
-                className="px-4 py-2 w-[180px] text-xs font-semibold uppercase tracking-wider text-slate-500 text-left whitespace-nowrap cursor-pointer hover:text-slate-800 transition-colors group"
+                className="px-4 py-2 w-[180px] text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-left whitespace-nowrap cursor-pointer hover:text-slate-800 dark:hover:text-slate-200 transition-colors group"
                 onClick={() => onSort("name")}
               >
                 <div className="flex items-center gap-2">
@@ -95,13 +95,13 @@ export const IPOTableDesktop: React.FC<Props> = ({
                   )}
                 </div>
               </th>
-              <th className="px-4 py-2 w-[110px] text-xs font-semibold uppercase tracking-wider text-slate-500 text-right whitespace-nowrap">
+              <th className="px-4 py-2 w-[110px] text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right whitespace-nowrap">
                 <div className="flex items-center justify-end gap-2">
                   <span>Exchange</span>
                 </div>
               </th>
               <th
-                className="px-4 py-2 w-[110px] text-xs font-semibold uppercase tracking-wider text-slate-500 text-right whitespace-nowrap cursor-pointer hover:text-slate-800 transition-colors group"
+                className="px-4 py-2 w-[110px] text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right whitespace-nowrap cursor-pointer hover:text-slate-800 dark:hover:text-slate-200 transition-colors group"
                 onClick={() => onSort("price")}
               >
                 <div className="flex items-center justify-end gap-2">
@@ -119,7 +119,7 @@ export const IPOTableDesktop: React.FC<Props> = ({
                 </div>
               </th>
               <th
-                className="px-4 py-2 w-[120px] text-xs font-semibold uppercase tracking-wider text-slate-500 text-right whitespace-nowrap cursor-pointer hover:text-slate-800 transition-colors group"
+                className="px-4 py-2 w-[120px] text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right whitespace-nowrap cursor-pointer hover:text-slate-800 dark:hover:text-slate-200 transition-colors group"
                 onClick={() => onSort("shares")}
               >
                 <div className="flex items-center justify-end gap-2">
@@ -137,7 +137,7 @@ export const IPOTableDesktop: React.FC<Props> = ({
                 </div>
               </th>
               <th
-                className="px-4 py-2 w-[130px] text-xs font-semibold uppercase tracking-wider text-slate-500 text-right whitespace-nowrap cursor-pointer hover:text-slate-800 transition-colors group"
+                className="px-4 py-2 w-[130px] text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right whitespace-nowrap cursor-pointer hover:text-slate-800 dark:hover:text-slate-200 transition-colors group"
                 onClick={() => onSort("raise")}
               >
                 <div className="flex items-center justify-end gap-2">
@@ -155,7 +155,7 @@ export const IPOTableDesktop: React.FC<Props> = ({
                 </div>
               </th>
               <th
-                className="px-4 py-2 w-[120px] text-xs font-semibold uppercase tracking-wider text-slate-500 text-right whitespace-nowrap cursor-pointer hover:text-slate-800 transition-colors group"
+                className="px-4 py-2 w-[120px] text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right whitespace-nowrap cursor-pointer hover:text-slate-800 dark:hover:text-slate-200 transition-colors group"
                 onClick={() => onSort("date")}
               >
                 <div className="flex items-center justify-end gap-2">
@@ -175,7 +175,7 @@ export const IPOTableDesktop: React.FC<Props> = ({
               <th className="px-4 py-2 w-[50px]"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-gray-50 dark:divide-[#252f3e]">
             {loading
               ? Array.from({ length: 10 }).map((_, idx) => (
                   <tr key={idx} className="animate-pulse">
@@ -206,18 +206,18 @@ export const IPOTableDesktop: React.FC<Props> = ({
                   <tr
                     key={ipo.cik}
                     onClick={(e) => handleRowClick(ipo.cik, e)}
-                    className="hover:bg-slate-50/50 transition-colors duration-200 cursor-pointer group/row"
+                    className="hover:bg-slate-50/50 dark:hover:bg-[#1c2333]/60 transition-colors duration-200 cursor-pointer group/row"
                   >
                     <td
                       className="px-4 py-5 text-sm text-left align-middle"
                       title={ipo.companyName}
                     >
                       <div className="flex flex-col leading-tight">
-                        <span className="font-semibold text-slate-900">
+                        <span className="font-semibold text-slate-900 dark:text-slate-100">
                           {ipo.companyName}
                         </span>
                         {ipo.ticker && ipo.ticker.trim() !== "" && (
-                          <span className="text-xs text-slate-500 mt-0.5">
+                          <span className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                             {ipo.ticker}
                           </span>
                         )}
@@ -232,24 +232,24 @@ export const IPOTableDesktop: React.FC<Props> = ({
                         {ipo.exchange || "Unknown"}
                       </span>
                     </td>
-                    <td className="px-4 py-5 text-sm text-right text-slate-700 align-middle whitespace-nowrap font-medium">
+                    <td className="px-4 py-5 text-sm text-right text-slate-700 dark:text-slate-300 align-middle whitespace-nowrap font-medium">
                       {formatPrice(ipo.sharePrice)}
                     </td>
-                    <td className="px-4 py-5 text-sm text-right text-slate-700 align-middle font-medium">
+                    <td className="px-4 py-5 text-sm text-right text-slate-700 dark:text-slate-300 align-middle font-medium">
                       {withPlaceholder(ipo.sharesOffered)}
                     </td>
                     <td className="px-4 py-5 text-sm text-right align-middle font-semibold">
                       {ipo.raiseAmount && ipo.raiseAmount.trim() !== "" ? (
-                        <span className="text-slate-900">
+                        <span className="text-slate-900 dark:text-slate-100">
                           {formatCurrency(ipo.raiseAmount)}
                         </span>
                       ) : (
-                        <span className="text-slate-400 italic font-normal">
+                        <span className="text-slate-400 dark:text-slate-500 italic font-normal">
                           Not available
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-5 text-sm text-right align-middle text-slate-700">
+                    <td className="px-4 py-5 text-sm text-right align-middle text-slate-700 dark:text-slate-300">
                       {formatIpoDate(ipo.estimatedIpoDate)}
                     </td>
                     <td className="px-4 py-5 text-center align-middle">

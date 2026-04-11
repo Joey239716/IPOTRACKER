@@ -69,7 +69,7 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 select-none">
       {/* Navbar */}
-      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 transition-colors">
+      <div className="bg-white dark:bg-[#1c2333] border-b border-gray-200 dark:border-[#252f3e] transition-colors">
         <div className="max-w-7xl 2xl:max-w-screen-2xl mx-auto px-2">
           <div className="flex items-center h-16 gap-6">
             <Link
@@ -93,7 +93,7 @@ export default function Navbar() {
                   placeholder="Search company or ticker..."
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  className="w-full pl-8 pr-3 py-1.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg text-slate-700 dark:text-gray-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-100 caret-auto select-text"
+                  className="w-full pl-8 pr-3 py-1.5 text-sm bg-gray-50 dark:bg-[#252f3e] border border-gray-200 dark:border-[#2e3a4e] rounded-lg text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-100 caret-auto select-text"
                 />
               </div>
             )}
@@ -126,7 +126,7 @@ export default function Navbar() {
                 {settingsOpen && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setSettingsOpen(false)} />
-                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50">
+                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-[#1c2333] border border-gray-200 dark:border-[#252f3e] rounded-md shadow-lg z-50">
                       <div className="block px-4 py-2 text-sm text-gray-400 dark:text-gray-500 cursor-not-allowed select-none">
                         <div className="flex items-center justify-between">
                           <span>Profile</span>
@@ -139,11 +139,11 @@ export default function Navbar() {
                           <span className="text-xs italic">Coming Soon</span>
                         </div>
                       </div>
-                      <div className="flex items-center justify-between px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 select-none">
-                        <span className="text-sm text-gray-700 dark:text-gray-200">Dark Mode</span>
+                      <div className="flex items-center justify-between px-4 py-2 hover:bg-gray-100 dark:hover:bg-[#252f3e] select-none">
+                        <span className="text-sm text-gray-700 dark:text-slate-200">Dark Mode</span>
                         <label className="relative inline-flex items-center cursor-pointer select-none">
                           <input type="checkbox" className="sr-only peer" checked={darkMode} onChange={toggleDarkMode} />
-                          <div className="w-10 h-5 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 dark:bg-gray-700 rounded-full peer peer-checked:bg-blue-600 transition-colors" />
+                          <div className="w-10 h-5 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 dark:bg-[#252f3e] rounded-full peer peer-checked:bg-blue-600 transition-colors" />
                           <div className="absolute left-0.5 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-5" />
                         </label>
                       </div>
@@ -197,7 +197,7 @@ export default function Navbar() {
 
         {/* 📱 Mobile dropdown */}
         {isOpen && (
-          <div className="md:hidden px-4 pb-4 bg-white dark:bg-gray-900 space-y-3">
+          <div className="md:hidden px-4 pb-4 bg-white dark:bg-[#1c2333] space-y-3">
             {navItems.map((item) => (
               <Link
                 key={item.href}
@@ -205,19 +205,19 @@ export default function Navbar() {
                 onClick={() => setIsOpen(false)}
                 className={`block px-4 py-2 rounded-md select-none caret-transparent focus:outline-none ${
                   pathname === item.href
-                    ? "bg-blue-50 dark:bg-gray-800 text-blue-600"
-                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    ? "bg-blue-50 dark:bg-[#252f3e] text-blue-600"
+                    : "text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-[#252f3e]"
                 }`}
               >
                 {item.label}
               </Link>
             ))}
 
-            <hr className="border-t border-gray-300 dark:border-gray-700" />
+            <hr className="border-t border-gray-300 dark:border-[#252f3e]" />
 
             {/* 🌙 Dark mode toggle (mobile) */}
-            <div className="flex items-center justify-between px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 select-none">
-              <span className="text-sm text-gray-700 dark:text-gray-200">
+            <div className="flex items-center justify-between px-4 py-2 hover:bg-gray-100 dark:hover:bg-[#252f3e] select-none">
+              <span className="text-sm text-gray-700 dark:text-slate-200">
                 Dark Mode
               </span>
               <label className="relative inline-flex items-center cursor-pointer select-none">
@@ -227,7 +227,7 @@ export default function Navbar() {
                   checked={darkMode}
                   onChange={toggleDarkMode}
                 />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 dark:bg-gray-700 rounded-full peer peer-checked:bg-blue-600 transition-colors" />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 dark:bg-[#252f3e] rounded-full peer peer-checked:bg-blue-600 transition-colors" />
                 <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-5" />
               </label>
             </div>
@@ -268,7 +268,7 @@ export default function Navbar() {
       {/* ✅ Logout Success Modal */}
       {showLogoutModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50">
-          <div className="relative w-[90%] max-w-sm rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-xl bg-white dark:bg-gray-900 text-gray-800 dark:text-white transform transition-all duration-300 ease-out">
+          <div className="relative w-[90%] max-w-sm rounded-lg border border-gray-200 dark:border-[#252f3e] p-6 shadow-xl bg-white dark:bg-[#161b27] text-gray-800 dark:text-slate-100 transform transition-all duration-300 ease-out">
             <div className="flex flex-col items-center">
               <div className="w-16 h-16 flex items-center justify-center bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full mb-4">
                 <svg
