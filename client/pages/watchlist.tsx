@@ -229,17 +229,17 @@ export default function WatchlistPage() {
                 <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-blue-100/30 dark:from-gray-800/50 dark:to-gray-900/50 rounded-2xl blur-xl" />
                 <div className="relative animate-pulse bg-white/30 dark:bg-white/5 backdrop-blur-xl border border-white/50 dark:border-gray-700/50 rounded-2xl p-6 h-72 shadow-xl">
                   <div className="flex items-start gap-4 mb-6">
-                    <div className="w-14 h-14 bg-gray-300/50 dark:bg-gray-600/50 rounded-xl" />
+                    <div className="w-14 h-14 bg-gray-300/50 dark:bg-[#1c1e2c] rounded-xl" />
                     <div className="flex-1 space-y-2">
-                      <div className="h-5 bg-gray-300/50 dark:bg-gray-600/50 rounded w-3/4" />
-                      <div className="h-6 bg-gray-300/50 dark:bg-gray-600/50 rounded w-20" />
+                      <div className="h-5 bg-gray-300/50 dark:bg-[#1c1e2c] rounded w-3/4" />
+                      <div className="h-6 bg-gray-300/50 dark:bg-[#1c1e2c] rounded w-20" />
                     </div>
                   </div>
                   <div className="space-y-3">
                     {[...Array(4)].map((_, j) => (
                       <div
                         key={j}
-                        className="h-4 bg-gray-300/50 dark:bg-gray-600/50 rounded"
+                        className="h-4 bg-gray-300/50 dark:bg-[#1c1e2c] rounded"
                       />
                     ))}
                   </div>

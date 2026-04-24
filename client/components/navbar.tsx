@@ -205,7 +205,7 @@ export default function Navbar() {
                 onClick={() => setIsOpen(false)}
                 className={`block px-4 py-2 rounded-md select-none caret-transparent focus:outline-none ${
                   pathname === item.href
-                    ? "bg-blue-50 dark:bg-[#252f3e] text-blue-600"
+                    ? "bg-blue-50 dark:bg-[rgba(91,106,240,0.12)] text-blue-600"
                     : "text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-[#252f3e]"
                 }`}
               >

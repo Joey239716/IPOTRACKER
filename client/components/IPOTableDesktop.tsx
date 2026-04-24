@@ -180,25 +180,25 @@ export const IPOTableDesktop: React.FC<Props> = ({
               ? Array.from({ length: 10 }).map((_, idx) => (
                   <tr key={idx} className="animate-pulse">
                     <td className="px-4 py-5">
-                      <div className="w-32 h-4 bg-slate-100 rounded" />
+                      <div className="w-32 h-4 bg-slate-100 dark:bg-[#1c1e2c] rounded" />
                     </td>
                     <td className="px-4 py-5 text-right">
-                      <div className="w-20 h-6 bg-slate-100 rounded ml-auto" />
+                      <div className="w-20 h-6 bg-slate-100 dark:bg-[#1c1e2c] rounded ml-auto" />
                     </td>
                     <td className="px-4 py-5 text-right">
-                      <div className="w-16 h-4 bg-slate-100 rounded ml-auto" />
+                      <div className="w-16 h-4 bg-slate-100 dark:bg-[#1c1e2c] rounded ml-auto" />
                     </td>
                     <td className="px-4 py-5 text-right">
-                      <div className="w-20 h-4 bg-slate-100 rounded ml-auto" />
+                      <div className="w-20 h-4 bg-slate-100 dark:bg-[#1c1e2c] rounded ml-auto" />
                     </td>
                     <td className="px-4 py-5 text-right">
-                      <div className="w-24 h-4 bg-slate-200 rounded ml-auto" />
+                      <div className="w-24 h-4 bg-slate-200 dark:bg-[#252840] rounded ml-auto" />
                     </td>
                     <td className="px-4 py-5 text-right">
-                      <div className="w-20 h-4 bg-slate-100 rounded ml-auto" />
+                      <div className="w-20 h-4 bg-slate-100 dark:bg-[#1c1e2c] rounded ml-auto" />
                     </td>
                     <td className="px-4 py-5 text-center">
-                      <div className="w-5 h-5 bg-slate-100 rounded mx-auto" />
+                      <div className="w-5 h-5 bg-slate-100 dark:bg-[#1c1e2c] rounded mx-auto" />
                     </td>
                   </tr>
                 ))

@@ -164,15 +164,15 @@ export function IPOStats({ ipos, loading }: IPOStatsProps) {
             className="bg-white dark:bg-[#161b27] rounded-xl border border-gray-200 dark:border-[#252f3e] p-5 animate-pulse"
           >
             <div className="flex justify-between mb-4">
-              <div className="h-4 bg-slate-100 rounded w-24" />
-              <div className="h-4 w-4 bg-slate-100 rounded" />
+              <div className="h-4 bg-slate-100 dark:bg-[#1c1e2c] rounded w-24" />
+              <div className="h-4 w-4 bg-slate-100 dark:bg-[#1c1e2c] rounded" />
             </div>
             <div className="flex items-end justify-between">
               <div>
-                <div className="h-8 bg-slate-200 rounded w-16 mb-2" />
-                <div className="h-3 bg-slate-100 rounded w-28" />
+                <div className="h-8 bg-slate-200 dark:bg-[#252840] rounded w-16 mb-2" />
+                <div className="h-3 bg-slate-100 dark:bg-[#1c1e2c] rounded w-28" />
               </div>
-              <div className="w-20 h-9 bg-slate-100 rounded" />
+              <div className="w-20 h-9 bg-slate-100 dark:bg-[#1c1e2c] rounded" />
             </div>
           </div>
         ))}

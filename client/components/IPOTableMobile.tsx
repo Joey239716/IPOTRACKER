@@ -66,16 +66,16 @@ export const IPOTableMobile: React.FC<Props> = ({
               className="p-5 rounded-2xl bg-white dark:bg-[#1c2333] border border-gray-100 dark:border-[#252f3e] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] animate-pulse"
             >
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-5 h-5 bg-slate-100 rounded" />
-                <div className="w-10 h-10 bg-slate-200 rounded-lg" />
-                <div className="flex-1 h-4 bg-slate-100 rounded" />
+                <div className="w-5 h-5 bg-slate-100 dark:bg-[#1c1e2c] rounded" />
+                <div className="w-10 h-10 bg-slate-200 dark:bg-[#252840] rounded-lg" />
+                <div className="flex-1 h-4 bg-slate-100 dark:bg-[#1c1e2c] rounded" />
               </div>
               <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
                 {["Price", "Shares", "Raise", "Est. IPO", "Exchange"].map(
                   (label, i) => (
                     <React.Fragment key={i}>
                       <div className="font-medium text-slate-500">{label}</div>
-                      <div className="h-4 bg-slate-100 rounded" />
+                      <div className="h-4 bg-slate-100 dark:bg-[#1c1e2c] rounded" />
                     </React.Fragment>
                   )
                 )}

@@ -5,15 +5,15 @@ import React from "react";
 export const exchangeBadgeClasses = (ex: string) => {
   switch (ex) {
     case "NASDAQ":
-      return "bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-600 dark:text-blue-400 border border-blue-400/30";
+      return "bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-600 border border-blue-400/30 dark:bg-none dark:bg-[rgba(91,106,240,0.10)] dark:text-[#818cf8] dark:border-[rgba(91,106,240,0.20)]";
     case "NYSE":
-      return "bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-400/30";
+      return "bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-600 border border-emerald-400/30 dark:bg-none dark:bg-[rgba(34,197,94,0.08)] dark:text-[#4ade80] dark:border-[rgba(34,197,94,0.20)]";
     case "CBOE":
-      return "bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-600 dark:text-cyan-400 border border-cyan-400/30";
+      return "bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-600 border border-cyan-400/30 dark:bg-none dark:bg-[rgba(100,116,139,0.08)] dark:text-[#64748b] dark:border-[rgba(100,116,139,0.15)]";
     case "OTC":
-      return "bg-gradient-to-r from-pink-500/20 to-rose-500/20 text-pink-600 dark:text-pink-400 border border-pink-400/30";
+      return "bg-gradient-to-r from-pink-500/20 to-rose-500/20 text-pink-600 border border-pink-400/30 dark:bg-none dark:bg-[rgba(100,116,139,0.08)] dark:text-[#64748b] dark:border-[rgba(100,116,139,0.15)]";
     default:
-      return "bg-gray-200/50 text-gray-600 dark:bg-gray-600/50 dark:text-gray-300";
+      return "bg-gray-200/50 text-gray-600 dark:bg-[rgba(100,116,139,0.08)] dark:text-[#64748b] dark:border dark:border-[rgba(100,116,139,0.15)]";
   }
 };
 

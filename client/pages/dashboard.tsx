@@ -14,6 +14,8 @@ import {
   ChevronLeft,
   ChevronUp,
   ChevronDown,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { exchangeBadgeClasses, formatCurrency, formatPrice, withPlaceholder } from "@/lib/ipo-utils";
 import { IPO, SortColumn, SortDirection } from "@/lib/types";
@@ -62,6 +64,21 @@ export default function Dashboard() {
   const [starLoading, setStarLoading] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("theme");
+    const isDark = stored === "dark" || (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    setDarkMode(isDark);
+    document.documentElement.classList.toggle("dark", isDark);
+  }, []);
+
+  const toggleDarkMode = () => {
+    const next = !darkMode;
+    setDarkMode(next);
+    document.documentElement.classList.toggle("dark", next);
+    localStorage.setItem("theme", next ? "dark" : "light");
+  };
 
   // Sorting
   const [sortColumn, setSortColumn] = useState<SortColumn | null>(null);
@@ -210,6 +227,31 @@ export default function Dashboard() {
           })}
         </nav>
 
+        {/* Dark mode toggle */}
+        <div className={`border-t border-gray-100 dark:border-gray-800 px-2 py-2 ${sidebarCollapsed ? "flex justify-center" : ""}`}>
+          {sidebarCollapsed ? (
+            <button
+              onClick={toggleDarkMode}
+              title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+              className="p-2 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+            >
+              {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+          ) : (
+            <div className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+              <div className="flex items-center gap-3 text-sm font-medium text-gray-600 dark:text-gray-400">
+                {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                <span>Dark Mode</span>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer select-none">
+                <input type="checkbox" className="sr-only peer" checked={darkMode} onChange={toggleDarkMode} />
+                <div className="w-8 h-4 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 dark:bg-gray-700 rounded-full peer peer-checked:bg-blue-600 transition-colors" />
+                <div className="absolute left-0.5 top-0.5 bg-white w-3 h-3 rounded-full transition-transform peer-checked:translate-x-4" />
+              </label>
+            </div>
+          )}
+        </div>
+
         {/* Collapse toggle */}
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
@@ -309,14 +351,14 @@ export default function Dashboard() {
                   {loading
                     ? Array.from({ length: 10 }).map((_, idx) => (
                         <tr key={idx} className="animate-pulse">
-                          <td className="px-4 py-4"><div className="w-4 h-4 bg-gray-100 dark:bg-gray-700 rounded" /></td>
-                          <td className="px-4 py-4"><div className="w-36 h-4 bg-gray-100 dark:bg-gray-700 rounded" /></td>
-                          <td className="px-4 py-4"><div className="w-20 h-5 bg-gray-100 dark:bg-gray-700 rounded-full" /></td>
-                          <td className="px-4 py-4 text-right"><div className="w-16 h-4 bg-gray-100 dark:bg-gray-700 rounded ml-auto" /></td>
-                          <td className="px-4 py-4 text-right"><div className="w-20 h-4 bg-gray-100 dark:bg-gray-700 rounded ml-auto" /></td>
-                          <td className="px-4 py-4 text-right"><div className="w-24 h-4 bg-gray-100 dark:bg-gray-700 rounded ml-auto" /></td>
-                          <td className="px-4 py-4"><div className="w-12 h-5 bg-gray-100 dark:bg-gray-700 rounded" /></td>
-                          <td className="px-4 py-4 text-right"><div className="w-20 h-4 bg-gray-100 dark:bg-gray-700 rounded ml-auto" /></td>
+                          <td className="px-4 py-4"><div className="w-4 h-4 bg-gray-100 dark:bg-[#1c1e2c] rounded" /></td>
+                          <td className="px-4 py-4"><div className="w-36 h-4 bg-gray-100 dark:bg-[#1c1e2c] rounded" /></td>
+                          <td className="px-4 py-4"><div className="w-20 h-5 bg-gray-100 dark:bg-[#1c1e2c] rounded-full" /></td>
+                          <td className="px-4 py-4 text-right"><div className="w-16 h-4 bg-gray-100 dark:bg-[#1c1e2c] rounded ml-auto" /></td>
+                          <td className="px-4 py-4 text-right"><div className="w-20 h-4 bg-gray-100 dark:bg-[#1c1e2c] rounded ml-auto" /></td>
+                          <td className="px-4 py-4 text-right"><div className="w-24 h-4 bg-gray-100 dark:bg-[#252840] rounded ml-auto" /></td>
+                          <td className="px-4 py-4"><div className="w-12 h-5 bg-gray-100 dark:bg-[#1c1e2c] rounded" /></td>
+                          <td className="px-4 py-4 text-right"><div className="w-20 h-4 bg-gray-100 dark:bg-[#1c1e2c] rounded ml-auto" /></td>
                         </tr>
                       ))
                     : paginatedIpos.map((ipo) => (

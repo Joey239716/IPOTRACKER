@@ -70,8 +70,8 @@ export default function CompanyPage() {
         <Navbar />
         <main className="max-w-5xl mx-auto p-6">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
-            <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            <div className="h-8 bg-gray-200 dark:bg-[#1c1e2c] rounded w-1/3 mb-4"></div>
+            <div className="h-64 bg-gray-200 dark:bg-[#1c1e2c] rounded"></div>
           </div>
         </main>
       </div>
